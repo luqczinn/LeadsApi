@@ -1,5 +1,6 @@
 using LeadsApi.Data;
 using Microsoft.EntityFrameworkCore;
+using LeadsApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,5 +28,21 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    if (!context.Leads.Any())
+    {
+        context.Leads.AddRange(
+            new Lead { FirstName = "Lucas", LastName = "Silva", Suburb = "Belo Horizonte", Category = "TI", Description = "Site institucional", Price = 450, Email = "lucas@email.com", PhoneNumber = "31999999999" },
+            new Lead { FirstName = "Ana", LastName = "Souza", Suburb = "São Paulo", Category = "Marketing", Description = "Campanha digital", Price = 1200, Email = "ana@email.com", PhoneNumber = "11988888888" },
+            new Lead { FirstName = "Carlos", LastName = "Oliveira", Suburb = "Rio de Janeiro", Category = "Consultoria", Description = "Treinamento corporativo", Price = 600, Email = "carlos@email.com", PhoneNumber = "21977777777" }
+        );
+
+        context.SaveChanges();
+    }
+}
 
 app.Run();
